@@ -3,6 +3,7 @@ package com.Conmiro.bots.testbot;
 import com.runemate.game.api.hybrid.entities.GameObject;
 import com.runemate.game.api.hybrid.input.Keyboard;
 import com.runemate.game.api.hybrid.local.hud.interfaces.*;
+import com.runemate.game.api.hybrid.net.GrandExchange;
 import com.runemate.game.api.hybrid.region.Banks;
 import com.runemate.game.api.hybrid.region.GameObjects;
 import com.runemate.game.api.script.Execution;
@@ -17,12 +18,13 @@ public class testbot extends LoopingScript {
 
     private GameObject portableCrafter;
     private GameObject bankChest;
-    private String color = "Blue";
+    private String color = "Black";
 
 
     @Override
     public void onLoop() {
- 
+
+
 
         if (!Inventory.contains(color+" dragonhide")) {
             if (Bank.isOpen()){

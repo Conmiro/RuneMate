@@ -1,0 +1,15 @@
+<manifest>
+    <main-class>com.Conmiro.bots.GETester.GETester</main-class>
+    <name>GE Tester</name>
+    <description>Tests Exchange implementation</description>
+    <version>0.0.1</version>
+
+    <compatibility>
+        <game-type>RS3</game-type>
+    </compatibility>
+
+    <categories>
+        <category>WOODCUTTING</category>
+    </categories>
+
+</manifest>
