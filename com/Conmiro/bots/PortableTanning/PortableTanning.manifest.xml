@@ -1,0 +1,15 @@
+<manifest>
+    <main-class>com.Conmiro.bots.PortableTanning.PortableTanning</main-class>
+    <name>Portable Tanning</name>
+    <description>Tans hides at a portable crafter.</description>
+    <version>0.3.0</version>
+
+    <compatibility>
+        <game-type>RS3</game-type>
+    </compatibility>
+
+    <categories>
+        <category>MONEYMAKING</category>
+    </categories>
+
+</manifest>
