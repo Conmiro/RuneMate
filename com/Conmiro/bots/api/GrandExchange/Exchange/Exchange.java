@@ -1,19 +1,16 @@
 package com.Conmiro.bots.api.GrandExchange.Exchange;
 
+import com.Conmiro.bots.api.Logging.Logger.Logger;
 import com.runemate.game.api.hybrid.entities.Npc;
-import com.runemate.game.api.hybrid.entities.definitions.ItemDefinition;
 import com.runemate.game.api.hybrid.input.Keyboard;
 import com.runemate.game.api.hybrid.input.Mouse;
-import com.runemate.game.api.hybrid.local.hud.interfaces.Bank;
 import com.runemate.game.api.hybrid.local.hud.interfaces.InterfaceComponent;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Interfaces;
-import com.runemate.game.api.hybrid.queries.InterfaceComponentQueryBuilder;
-import com.runemate.game.api.hybrid.region.GameObjects;
 import com.runemate.game.api.hybrid.region.Npcs;
 import com.runemate.game.api.script.Execution;
-import com.sun.media.jfxmedia.logging.Logger;
 
 /**
+ *  Helper class for peforming operations while the G.E. is open.
  * Created by Connor on 7/8/2016.
  */
 public class Exchange {
@@ -21,9 +18,15 @@ public class Exchange {
     private final static int grandExchangeContainerId = 105;
     private final static int confirmOfferComponentId = 169;
     private final static int searchResultsComponentId = 53;
+    private final static int buyButtonTextureId = 1170;
 
-    //could base these off their images instead.......hmmmmmmmmmmmm
+    /**
+     * Old way of doing things.........
+     */
+    //could base these off their images instead.......
+    @Deprecated
     private final static int[] buyComponentIds = {175,186,198,211,227,243,260,277};
+    @Deprecated
     private final static int[] sellComponentIds = {180,192,204,217,233,249,283,266};
 
 
@@ -36,25 +39,23 @@ public class Exchange {
         return clerk.interact("Exchange", clerk.getName());
     }
 
+
     /**
      * Queries interface for number of empty slots.
      * @return Number of empty exchange slots available
      */
     public static int getEmptyCount() {
-        return Interfaces.newQuery().containers(grandExchangeContainerId).visible().texts("Empty").results().size();
+        return Interfaces.newQuery().visible().textures(buyButtonTextureId).results().size();
     }
 
     /**
      * Iterates through buy button components and returns first available buy button
      * @return First available buy button interface component
      */
-    public static InterfaceComponent getBuyButton() {
-        for (int i: buyComponentIds) {
-            InterfaceComponent comp = Interfaces.getAt(grandExchangeContainerId, i);
-            if (comp != null && comp.isValid() && comp.isVisible()){
-                System.out.println("Component found: " + comp.getContainedItemId() + "," + comp.getIndex());
-                return comp;
-            }
+    private static InterfaceComponent getBuyButton() {
+        InterfaceComponent comp = Interfaces.newQuery().visible().textures(buyButtonTextureId).results().first();
+        if (comp != null && comp.isValid() && comp.isVisible()) {
+            return comp;
         }
         return null;
     }
@@ -67,35 +68,72 @@ public class Exchange {
         return !Interfaces.newQuery().containers(grandExchangeContainerId).visible().texts("Confirm Offer").results().isEmpty();
     }
 
-    public static Boolean startBuyOffer() {
+    private static Boolean startBuyOffer() {
         InterfaceComponent buyButton = getBuyButton();
         if (buyButton!=null) {
             buyButton.click();
             return Execution.delayUntil(Exchange::isOfferOpen, 2000);
         }
-        System.out.println("Buy button not found");
+        Logger.error("An available buy button was not found. Buy offer not started.");
         return false;
     }
 
-    public static Boolean buyItem(String item) {
+    private static Boolean validate(InterfaceComponent comp){
+        if (comp != null && comp.isValid() && comp.isVisible()){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Backs out of an offer during creation.
+     * @return
+     */
+    private static Boolean backOutOffer() {
+        Logger.debug("Backing out of offer.");
+        InterfaceComponent backButton = Interfaces.newQuery().actions("Back").results().first();
+        if (validate(backButton)){
+            return backButton.click();
+        }
+        Logger.error("Problem backing out of offer.");
+        return false;
+    }
+
+    /**
+     * Creates a new buy offer for given item
+     * in an available exchange slot.
+     *
+     * @param item Item to create the offer for
+     * @return Success value
+     */
+    public static Boolean buyOffer(String item) {
         if (!isOpen()){
             return false;
         }
         if (!startBuyOffer()){
-            System.out.println("Failed to start buy offer");
             return false;
         }
 
         Execution.delay(1000,2000);
 
         if (!searchItem(item)) {
-            System.out.println("Failed to search for item");
+            backOutOffer();
             return false;
         }
-        if (!setQuantity(1))
+
+        Execution.delay(500);
+
+        if (!setQuantity(1)) {
+            backOutOffer();
             return false;
-        if (!confirmOffer())
+        }
+
+        Execution.delay(500);
+
+        if (!confirmOffer()) {
+            backOutOffer();
             return false;
+        }
 
         return true;
     }
@@ -117,6 +155,7 @@ public class Exchange {
         InterfaceComponent addOneButton = Interfaces.newQuery().containers(105).visible().actions("Add 1").results().first();
         for (int i = 0; i < n; i++){
             if (!addOneButton.click()){
+                Logger.error("Problem clicking incrementer.");
                 return false;
             }
         }
@@ -132,16 +171,20 @@ public class Exchange {
         //TODO add continuing if narrowed to one result.
 
         if (!Keyboard.type(item, false)){
-            System.out.println("Failed to type.");
+            Logger.error("Keyboard typing failed.");
             return false;
         }
 
         if (!Execution.delayUntil(() -> getTargetItemSearchResultButton(item) != null, 2000)){
             return false;
         }
-
         InterfaceComponent itemButton = getTargetItemSearchResultButton(item);
         InterfaceComponent searchBounds = Interfaces.getAt(grandExchangeContainerId,searchResultsComponentId);
+
+        if (itemButton == null || searchBounds == null){
+            Logger.error("The item could not be found in search results.");
+            return false;
+        }
 
         while (itemButton.getBounds().getCenterY() > searchBounds.getBounds().getMaxY()){
             Mouse.move(searchBounds.getBounds().getCenterPoint());
