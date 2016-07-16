@@ -1,6 +1,6 @@
 <manifest>
-    <main-class>com.Conmiro.bots.GETester.GETester</main-class>
-    <name>GE Tester</name>
+    <main-class>com.Conmiro.bots.ExchangeTester.ExchangeTester</main-class>
+    <name>Exchange Tester</name>
     <description>Tests Exchange implementation</description>
     <version>0.0.1</version>
 
@@ -9,7 +9,7 @@
     </compatibility>
 
     <categories>
-        <category>WOODCUTTING</category>
+        <category>DEVELOPER_TOOLS</category>
     </categories>
 
 </manifest>

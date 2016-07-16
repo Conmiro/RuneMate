@@ -11,6 +11,15 @@ public class Logger {
 
     private static final int defaultLogLevel = 3;
     private static int logLevel = defaultLogLevel;
+    private static String status = "Default";
+
+    public static void printStatus(){
+        System.out.println("*Logger*<Status>" + status);
+    }
+
+    public static void status(String str){
+        status = str;
+    }
 
     public static void info(String str) {
         if (logLevel > 2){

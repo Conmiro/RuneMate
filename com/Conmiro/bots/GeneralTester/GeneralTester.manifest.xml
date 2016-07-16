@@ -1,0 +1,15 @@
+<manifest>
+    <main-class>com.Conmiro.bots.GeneralTester.GeneralTester</main-class>
+    <name>General Tester</name>
+    <description>Tests random implementations</description>
+    <version>0.0.1</version>
+
+    <compatibility>
+        <game-type>RS3</game-type>
+    </compatibility>
+
+    <categories>
+        <category>DEVELOPER_TOOLS</category>
+    </categories>
+
+</manifest>
