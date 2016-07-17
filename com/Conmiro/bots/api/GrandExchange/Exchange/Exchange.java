@@ -10,7 +10,7 @@ import com.runemate.game.api.hybrid.region.Npcs;
 import com.runemate.game.api.script.Execution;
 
 /**
- * Helper class for peforming operations while the G.E. is open.
+ * Helper class for performing operations while the G.E. is open.
  * Created by Connor on 7/8/2016.
  */
 public class Exchange {
@@ -78,7 +78,6 @@ public class Exchange {
                 }
             }
         }
-
         return false;
     }
 

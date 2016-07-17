@@ -20,7 +20,7 @@ import java.time.Instant;
 public class PortableTanning extends LoopingScript implements ChatboxListener {
 
     //TODO Add ability to select hide colors in runemate interface
-    private String color = "Royal"; //color of hide to tan
+    private String color = "Black"; //color of hide to tan
     private int failed, success = 0; //tracker numbers
     private Instant startTime; //start time
 
