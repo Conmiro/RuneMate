@@ -31,6 +31,8 @@ public class PortableTanning extends LoopingScript implements ChatboxListener {
         GameObject portableCrafter = GameObjects.newQuery().names("Portable crafter").results().nearest();
         GameObject bankChest = Banks.getLoadedBankChests().nearest();
 
+
+
         //If inventory has no dragonhide.
         if (!Inventory.contains(color+" dragonhide")) {
             //If bank is open

@@ -1,11 +1,17 @@
 package com.Conmiro.bots.api.GrandExchange.Exchange;
 
 import com.Conmiro.bots.api.Logging.Logger.Logger;
+import com.runemate.game.api.hybrid.entities.definitions.ItemDefinition;
 import com.runemate.game.api.hybrid.input.Keyboard;
 import com.runemate.game.api.hybrid.input.Mouse;
 import com.runemate.game.api.hybrid.local.hud.interfaces.InterfaceComponent;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Interfaces;
+import com.runemate.game.api.hybrid.net.GrandExchange;
+import com.runemate.game.api.hybrid.region.Banks;
 import com.runemate.game.api.script.Execution;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Connor on 7/16/2016.
@@ -21,6 +27,7 @@ public class Offer {
     private final static int confirmOfferComponentId = Constants.confirmOfferComponentId;
     private final static int currentItemComponentId = Constants.currentItemComponentId;
     private final static int quantityComponentId = Constants.quantityComponentId;
+    private final static int offerItemComponentId = Constants.offerItemComponentId;
 
     /**
      * Starts specified type of offer
@@ -195,11 +202,12 @@ public class Offer {
     }
 
     /**
-     * Returns the item in the current open offer.
+     * Returns the item name in the current open offer.
      *
      * @return
      */
-    public static String currentItem() {
+    @Deprecated
+    public static String getCurrentItemName() {
         InterfaceComponent button = Interfaces.getAt(grandExchangeContainerId, currentItemComponentId);
         if (button != null)
             return button.getText();
@@ -207,6 +215,37 @@ public class Offer {
             return null;
     }
 
+
+    /**
+     * Returns GrandExchange.Item object for item in current offer.
+     * Allows access to name, price, etc.
+     *
+     * @return
+     */
+    public static GrandExchange.Item getCurrentItem() {
+        InterfaceComponent itemButton = Interfaces.getAt(grandExchangeContainerId, offerItemComponentId);
+        GrandExchange.Item item = null;
+        if (itemButton!=null && itemButton.isValid() && itemButton.isVisible()) {
+            item = GrandExchange.lookup(itemButton.getContainedItemId());
+        }
+        return item;
+    }
+
+
+    /**
+     * Returns the current offer price per item
+     *
+     * @return
+     */
+    public static int getCurrentPrice() {
+        Pattern pattern = Pattern.compile("(\\d*) gp");
+        InterfaceComponent priceBox = Interfaces.newQuery().containers(grandExchangeContainerId).visible().texts(pattern).actions("Enter Number").results().first();
+        if (priceBox != null) {
+            Matcher m = pattern.matcher(priceBox.getText());
+            return Integer.parseInt(m.group(1));
+        }
+        return -1;
+    }
 
 
 

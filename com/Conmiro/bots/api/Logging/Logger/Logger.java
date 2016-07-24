@@ -19,6 +19,7 @@ public class Logger {
 
     public static void status(String str){
         status = str;
+        printStatus();
     }
 
     public static void info(String str) {

@@ -2,6 +2,7 @@ package com.Conmiro.bots.api.GrandExchange.Exchange;
 
 import com.Conmiro.bots.api.Logging.Logger.Logger;
 import com.runemate.game.api.hybrid.entities.Npc;
+import com.runemate.game.api.hybrid.entities.details.Locatable;
 import com.runemate.game.api.hybrid.input.Keyboard;
 import com.runemate.game.api.hybrid.input.Mouse;
 import com.runemate.game.api.hybrid.local.hud.interfaces.InterfaceComponent;
@@ -9,15 +10,17 @@ import com.runemate.game.api.hybrid.local.hud.interfaces.Interfaces;
 import com.runemate.game.api.hybrid.region.Npcs;
 import com.runemate.game.api.script.Execution;
 
+import java.awt.*;
+
 /**
  * Helper class for performing operations while the G.E. is open.
  * Created by Connor on 7/8/2016.
  */
 public class Exchange {
 
-
+    private final static int grandExchangeContainerId = Constants.grandExchangeContainerId;
     private final static int buyButtonTextureId = Constants.buyButtonTextureId;
-
+    private final static Color offerCompletedColor = Constants.offerCompletedColor;
 
     /**
      * Opens the Grand Exchange via the nearest clerk
@@ -59,12 +62,13 @@ public class Exchange {
         if (!Exchange.isOpen()){
             Logger.status("Opening");
             Exchange.open();
+            Execution.delayUntil(Exchange::isOpen,500);
         }else {
             if (!Offer.isOpen()) {
                 Logger.status("Starting buy offer");
                 Offer.start("Buy");
             }else {
-                if (Offer.currentItem().compareToIgnoreCase(item) != 0){
+                if (Offer.getCurrentItemName().compareToIgnoreCase(item) != 0){
                     Logger.status("Searching for item");
                     Offer.searchItem(item);
                 }else {
@@ -72,8 +76,11 @@ public class Exchange {
                         Logger.status("Setting quantity");
                         Offer.setQuantity(1);
                     }else {
+                        Logger.info("Buying " + Offer.getCurrentItem().getName() + " for " + Offer.getCurrentPrice() + " gp.");
+                        Logger.info("Current Grand Exchange Price is: " + Offer.getCurrentItem().getPrice());
                         Logger.status("Confirming offer");
-                        return Offer.confirm();
+                        Offer.confirm();
+                        return Execution.delayUntil(() -> !Offer.isOpen(),1000);
                     }
                 }
             }
@@ -81,9 +88,15 @@ public class Exchange {
         return false;
     }
 
+    public static Boolean collectAllOffers() {
 
 
+        OfferSlot test = null;
 
+        int count = Interfaces.newQuery().containers(grandExchangeContainerId).visible().textColors(offerCompletedColor).results().size();
+        Logger.debug("Completed offers: " + count);
+        return false;
+    }
 
 
 
