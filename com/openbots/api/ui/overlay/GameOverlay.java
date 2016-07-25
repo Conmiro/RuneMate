@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GameOverlay extends JFrame {
+
     private DrawingPanel drawingPanel;
     public GameOverlay() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);

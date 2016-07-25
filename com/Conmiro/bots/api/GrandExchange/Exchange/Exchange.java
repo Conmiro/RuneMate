@@ -2,15 +2,16 @@ package com.Conmiro.bots.api.GrandExchange.Exchange;
 
 import com.Conmiro.bots.api.Logging.Logger.Logger;
 import com.runemate.game.api.hybrid.entities.Npc;
-import com.runemate.game.api.hybrid.entities.details.Locatable;
-import com.runemate.game.api.hybrid.input.Keyboard;
-import com.runemate.game.api.hybrid.input.Mouse;
-import com.runemate.game.api.hybrid.local.hud.interfaces.InterfaceComponent;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Interfaces;
+import com.runemate.game.api.hybrid.local.hud.interfaces.Inventory;
 import com.runemate.game.api.hybrid.region.Npcs;
 import com.runemate.game.api.script.Execution;
 
-import java.awt.*;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static com.Conmiro.bots.api.GrandExchange.Exchange.Constants.*;
 
 /**
  * Helper class for performing operations while the G.E. is open.
@@ -18,9 +19,6 @@ import java.awt.*;
  */
 public class Exchange {
 
-    private final static int grandExchangeContainerId = Constants.grandExchangeContainerId;
-    private final static int buyButtonTextureId = Constants.buyButtonTextureId;
-    private final static Color offerCompletedColor = Constants.offerCompletedColor;
 
     /**
      * Opens the Grand Exchange via the nearest clerk
@@ -29,7 +27,8 @@ public class Exchange {
      */
     public static Boolean open() {
         Npc clerk = Npcs.newQuery().visible().actions("Exchange").results().nearest();
-        return clerk.interact("Exchange", clerk.getName());
+        clerk.interact("Exchange", clerk.getName());
+        return Execution.delayUntil(Exchange::isOpen,500);
     }
 
     /**
@@ -41,13 +40,26 @@ public class Exchange {
         return !Interfaces.newQuery().containers(1477).texts("Grand Exchange").visible().results().isEmpty();
     }
 
-    /**
-     * Queries interface for number of empty slots.
-     *
-     * @return Number of empty exchange slots available
-     */
-    public static int getFreeSlots() {
-        return Interfaces.newQuery().visible().textures(buyButtonTextureId).results().size();
+
+    //Currently assuming item is in inventory
+    public static Boolean sellOffer(String item) {
+        if (!Exchange.isOpen()) {
+            Exchange.open();
+        }else {
+            if (!NewOffer.isOpen()){
+                if (Inventory.contains(item)){
+                    NewOffer.startSell(item);
+                }
+            }else{
+                if (!NewOffer.getCurrentItemName().equals(item)){
+                    NewOffer.backOut();
+                }else {
+                    return NewOffer.confirm();
+                }
+            }
+
+        }
+        return false;
     }
 
     /**
@@ -62,25 +74,23 @@ public class Exchange {
         if (!Exchange.isOpen()){
             Logger.status("Opening");
             Exchange.open();
-            Execution.delayUntil(Exchange::isOpen,500);
         }else {
-            if (!Offer.isOpen()) {
+            if (!NewOffer.isOpen()) {
                 Logger.status("Starting buy offer");
-                Offer.start("Buy");
+                NewOffer.startBuy();
             }else {
-                if (Offer.getCurrentItemName().compareToIgnoreCase(item) != 0){
+                if (NewOffer.getCurrentItemName().compareToIgnoreCase(item) != 0){
                     Logger.status("Searching for item");
-                    Offer.searchItem(item);
+                    NewOffer.searchItem(item);
                 }else {
-                    if (Offer.getQuantity() != 1){
+                    if (NewOffer.getQuantity() != 1){
                         Logger.status("Setting quantity");
-                        Offer.setQuantity(1);
+                        NewOffer.setQuantity(1);
                     }else {
-                        Logger.info("Buying " + Offer.getCurrentItem().getName() + " for " + Offer.getCurrentPrice() + " gp.");
-                        Logger.info("Current Grand Exchange Price is: " + Offer.getCurrentItem().getPrice());
+                        Logger.info("Buying " + NewOffer.getCurrentItem().getName() + " for " + NewOffer.getCurrentPrice() + " gp.");
+                        Logger.info("Current Grand Exchange Price is: " + NewOffer.getCurrentItem().getPrice());
                         Logger.status("Confirming offer");
-                        Offer.confirm();
-                        return Execution.delayUntil(() -> !Offer.isOpen(),1000);
+                        return NewOffer.confirm();
                     }
                 }
             }
@@ -88,17 +98,40 @@ public class Exchange {
         return false;
     }
 
-    public static Boolean collectAllOffers() {
 
+    /**
+     *
+     * @return True if all completed offers have been collected from.
+     */
 
-        OfferSlot test = null;
+    public static Boolean collectCompletedOffers() {
+        if (OfferSlots.getCompletedCount() == 0){
+            return true;
+        }else {
+            //If for some reason in the create offer page
+            if (NewOffer.isOpen()) {
+                NewOffer.backOut();
+            }else{
+                if (Offer.isOpen()) {
+                    //If viewing an offer that does not have collectible items
+                    if (!Offer.hasCollectibles()){
+                        Offer.backOut();
+                    }else {
+                        Offer.collect();
+                    }
+                } else {
+                    for (OfferSlot slot : OfferSlots.getAll()) {
+                        if (slot.isCompleted()) {
+                            slot.click();
+                            Execution.delayUntil(Offer::isOpen, 1000);
+                        }
+                    }
+                }
+            }
+        }
 
-        int count = Interfaces.newQuery().containers(grandExchangeContainerId).visible().textColors(offerCompletedColor).results().size();
-        Logger.debug("Completed offers: " + count);
         return false;
     }
-
-
 
 
 
