@@ -13,7 +13,7 @@ import static com.Conmiro.bots.api.GrandExchange.Exchange.Constants.*;
  * <p>
  * Created by Connor on 7/24/2016.
  */
-public class PendingOffer {
+public class PendingOffer extends Offer{
 
 
     public static Boolean isOpen() {
@@ -52,21 +52,6 @@ public class PendingOffer {
             if (box2 != null && box2.isVisible() && box2.isValid() && box2.getContainedItem() != null)
                 return true;
         }
-        return false;
-    }
-
-    /**
-     * Backs out of viewing an offer.
-     *
-     * @return
-     */
-    public static Boolean backOut() {
-        Logger.debug("Backing out of offer.");
-        InterfaceComponent backButton = Interfaces.newQuery().actions("Back").results().first();
-        if (backButton != null && backButton.isVisible() && backButton.isValid()) {
-            return backButton.click();
-        }
-        Logger.error("Problem backing out of offer.");
         return false;
     }
 
