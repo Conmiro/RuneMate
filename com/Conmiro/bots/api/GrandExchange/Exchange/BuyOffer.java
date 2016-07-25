@@ -23,7 +23,7 @@ public class BuyOffer extends SetupOffer {
      *
      * @return
      */
-    public static Boolean start() {
+    public static boolean start() {
         OfferSlot slot = OfferSlots.getFree();
         if (slot != null) {
             return slot.startBuy();
@@ -48,7 +48,7 @@ public class BuyOffer extends SetupOffer {
      * @param item
      * @return
      */
-    public static Boolean searchItem(String item) {
+    public static boolean searchItem(String item) {
 
         InterfaceComponent searchBox = Interfaces.getAt(grandExchangeContainerId, searchBoxComponentId);
 
@@ -90,7 +90,7 @@ public class BuyOffer extends SetupOffer {
     }
 
 
-    private static Boolean insideSearchBox() {
+    private static boolean insideSearchBox() {
         return Interfaces.newQuery().visible().texts("Click here to search for an item to buy.").results().isEmpty();
     }
 

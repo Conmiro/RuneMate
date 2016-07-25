@@ -11,7 +11,7 @@ import com.runemate.game.api.script.Execution;
  */
 public class SellOffer extends SetupOffer {
 
-    public static Boolean start(String item) {
+    public static boolean start(String item) {
         Inventory.getItems(item).first().click();
         return Execution.delayUntil(BuyOffer::isOpen, 2000);
     }

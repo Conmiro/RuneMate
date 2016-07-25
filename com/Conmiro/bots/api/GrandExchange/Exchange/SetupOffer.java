@@ -21,7 +21,7 @@ public class SetupOffer extends Offer {
      * @param n
      * @return
      */
-    public static Boolean setQuantity(int n) {
+    public static boolean setQuantity(int n) {
         //TODO add ability to click other buttons
         InterfaceComponent addOneButton = Interfaces.newQuery().containers(105).visible().actions("Add 1").results().first();
         for (int i = 0; i < n; i++) {
@@ -33,7 +33,7 @@ public class SetupOffer extends Offer {
     }
 
 
-    public static Boolean isOpen() {
+    public static boolean isOpen() {
         InterfaceComponent confirmButton = getConfirmButton();
         if (confirmButton != null && confirmButton.isVisible() && confirmButton.isValid())
             return true;
@@ -54,7 +54,7 @@ public class SetupOffer extends Offer {
      *
      * @return
      */
-    public static Boolean confirm() {
+    public static boolean confirm() {
         InterfaceComponent confirmButton = getConfirmButton();
         if (confirmButton != null && confirmButton.isValid() && confirmButton.isVisible()) {
             confirmButton.click();

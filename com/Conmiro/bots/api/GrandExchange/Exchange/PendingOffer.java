@@ -15,15 +15,14 @@ import static com.Conmiro.bots.api.GrandExchange.Exchange.Constants.*;
  */
 public class PendingOffer extends Offer{
 
-
-    public static Boolean isOpen() {
+    public static boolean isOpen() {
         InterfaceComponent inOfferStatusBar = Interfaces.getAt(grandExchangeContainerId, inOfferStatusBarComponentId);
         if (inOfferStatusBar != null && inOfferStatusBar.isVisible() && inOfferStatusBar.isValid())
             return true;
         return false;
     }
 
-    public static Boolean collect() {
+    public static boolean collect() {
         if (isOpen()) {
             InterfaceComponent box1 = Interfaces.getAt(grandExchangeContainerId, collectionBox1ComponentId);
             InterfaceComponent box2 = Interfaces.getAt(grandExchangeContainerId, collectionBox2ComponentId);
@@ -43,7 +42,7 @@ public class PendingOffer extends Offer{
      *
      * @return
      */
-    public static Boolean hasCollectibles() {
+    public static boolean hasCollectibles() {
         if (isOpen()) {
             InterfaceComponent box1 = Interfaces.getAt(grandExchangeContainerId, collectionBox1ComponentId);
             InterfaceComponent box2 = Interfaces.getAt(grandExchangeContainerId, collectionBox2ComponentId);

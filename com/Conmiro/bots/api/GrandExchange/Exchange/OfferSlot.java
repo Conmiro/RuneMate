@@ -26,7 +26,7 @@ public class OfferSlot{
 
     }
 
-    public Boolean isCompleted() {
+    public boolean isCompleted() {
         InterfaceComponent statusBar = Interfaces.getAt(grandExchangeContainerId, this.componentId, offerStatusBarComponentId);
         if (statusBar != null && statusBar.getTextColor().equals(offerCompletedColor)){
             return true;
@@ -34,7 +34,7 @@ public class OfferSlot{
         return false;
     }
 
-    public Boolean isInProgress() {
+    public boolean isInProgress() {
         InterfaceComponent statusBar = Interfaces.getAt(grandExchangeContainerId, this.componentId, offerStatusBarComponentId);
         if (statusBar != null && statusBar.getTextColor().equals(offerInProgressColor)){
             return true;
@@ -50,7 +50,7 @@ public class OfferSlot{
         return null;
     }
 
-    public Boolean click() {
+    public boolean click() {
         if (this.getType().equals("Buy") || this.getType().equals("Sell")) {
             InterfaceComponent offerBox = Interfaces.getAt(grandExchangeContainerId, this.componentId);
             return offerBox.click();
@@ -59,7 +59,7 @@ public class OfferSlot{
         return false;
     }
 
-    public Boolean startBuy() {
+    public boolean startBuy() {
         InterfaceComponent offerBox = Interfaces.getAt(grandExchangeContainerId, this.componentId);
         InterfaceComponentQueryResults buttons = Interfaces.newQuery().visible().textures(buyButtonTextureId).results();
         for (InterfaceComponent button : buttons) {

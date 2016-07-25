@@ -19,10 +19,13 @@ public class Exchange {
      *
      * @return Success value
      */
-    public static Boolean open() {
+    public static boolean open() {
         Npc clerk = Npcs.newQuery().visible().actions("Exchange").results().nearest();
-        clerk.interact("Exchange", clerk.getName());
-        return Execution.delayUntil(Exchange::isOpen, 500);
+        if (clerk!=null) {
+            clerk.interact("Exchange", clerk.getName());
+            return Execution.delayUntil(Exchange::isOpen, 500);
+        }
+        return false;
     }
 
     /**
@@ -30,7 +33,7 @@ public class Exchange {
      *
      * @return True if Grand Exchange is open.
      */
-    public static Boolean isOpen() {
+    public static boolean isOpen() {
         return !Interfaces.newQuery().containers(1477).texts("Grand Exchange").visible().results().isEmpty();
     }
 
@@ -42,7 +45,7 @@ public class Exchange {
      * @param item Item to create sell offer for.
      * @return Success
      */
-    public static Boolean sellOffer(String item) {
+    public static boolean sellOffer(String item) {
         if (!Exchange.isOpen()) {
             Exchange.open();
         } else {
@@ -69,7 +72,7 @@ public class Exchange {
      * @param item Item to create buy offer for.
      * @return Success
      */
-    public static Boolean buyOffer(String item) {
+    public static boolean buyOffer(String item) {
 
         if (!Exchange.isOpen()) {
             //Logger.status("Opening");
@@ -103,7 +106,7 @@ public class Exchange {
      *
      * @return Success
      */
-    public static Boolean collectCompletedOffers() {
+    public static boolean collectCompletedOffers() {
         if (OfferSlots.getCompletedCount() == 0) {
             return true;
         } else {

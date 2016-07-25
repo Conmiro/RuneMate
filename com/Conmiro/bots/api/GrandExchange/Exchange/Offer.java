@@ -23,7 +23,7 @@ public class Offer {
      *
      * @return True if open
      */
-    public static Boolean isOpen() {
+    public static boolean isOpen() {
         return !Interfaces.newQuery().containers(grandExchangeContainerId).visible().actions("Back").results().isEmpty();
     }
 
@@ -32,7 +32,7 @@ public class Offer {
      *
      * @return Success
      */
-    public static Boolean backOut() {
+    public static boolean backOut() {
         InterfaceComponent backButton = Interfaces.newQuery().actions("Back").results().first();
         if (backButton != null && backButton.isVisible() && backButton.isValid()) {
             backButton.click();

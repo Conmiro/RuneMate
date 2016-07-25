@@ -103,7 +103,7 @@ public class PortableTanning extends LoopingScript implements ChatboxListener {
         Logger.info("Stopping bot.");
     }
 
-    public Boolean validate(GameObject object){
+    public boolean validate(GameObject object){
         if (object != null & object.isVisible() && object.isVisible())
             return true;
         else

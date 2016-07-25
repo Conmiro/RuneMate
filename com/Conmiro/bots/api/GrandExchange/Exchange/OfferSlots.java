@@ -14,7 +14,7 @@ public class OfferSlots {
 
     public static OfferSlot getFree() {
         for (OfferSlot slot : getAll()) {
-            if (slot.getType().equals("Empty"))
+            if (slot.getType() != null && slot.getType().equals("Empty"))
                 return slot;
         }
         return null;
