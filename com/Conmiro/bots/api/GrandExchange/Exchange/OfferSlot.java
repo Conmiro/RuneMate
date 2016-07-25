@@ -65,7 +65,7 @@ public class OfferSlot{
         for (InterfaceComponent button : buttons) {
             if (offerBox.getBounds().contains(button.getBounds())){
                 button.click();
-                return Execution.delayUntil(Offer::isOpen, 2000);
+                return Execution.delayUntil(PendingOffer::isOpen, 2000);
             }
         }
         return false;

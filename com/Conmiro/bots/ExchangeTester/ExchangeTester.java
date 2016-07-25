@@ -1,13 +1,11 @@
 package com.Conmiro.bots.ExchangeTester;
 
 import com.Conmiro.bots.api.GrandExchange.Exchange.Exchange;
+import com.Conmiro.bots.api.GrandExchange.Exchange.OfferSlots;
 import com.Conmiro.bots.api.Logging.Logger.Logger;
 import com.runemate.game.api.hybrid.GameEvents;
 import com.runemate.game.api.hybrid.entities.GameObject;
-import com.runemate.game.api.hybrid.entities.Item;
-import com.runemate.game.api.hybrid.input.Mouse;
-import com.runemate.game.api.hybrid.net.GrandExchange;
-import com.runemate.game.api.script.Execution;
+import com.runemate.game.api.hybrid.local.hud.interfaces.Inventory;
 import com.runemate.game.api.script.framework.LoopingScript;
 
 /**
@@ -18,20 +16,16 @@ public class ExchangeTester extends LoopingScript {
     @Override
     public void onLoop() {
 
-        Exchange.sellOffer("Monkfish");
-
-        /*
-        if (Exchange.isOpen()){
-            if (Exchange.hasCompletedOffers()){
-                //Logger.debug("Has completed offers");
-                Exchange.collectCompletedOffers();
-            }
-        }else {
-            Exchange.open();
-        }*/
-
-
-
+        if (OfferSlots.getCompletedCount() > 0) {
+            Logger.status("Collecting.");
+            Exchange.collectCompletedOffers();
+        } else if (Inventory.contains("Monkfish")) {
+            Logger.status("Selling");
+            Exchange.sellOffer("Monkfish");
+        } else {
+            Logger.status("Buying");
+            Exchange.buyOffer("Monkfish");
+        }
 
     }
 

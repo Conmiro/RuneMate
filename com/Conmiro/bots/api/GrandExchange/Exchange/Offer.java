@@ -1,75 +1,120 @@
 package com.Conmiro.bots.api.GrandExchange.Exchange;
 
-import com.Conmiro.bots.api.Logging.Logger.Logger;
 import com.runemate.game.api.hybrid.local.hud.interfaces.InterfaceComponent;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Interfaces;
+import com.runemate.game.api.hybrid.net.GrandExchange;
+import com.runemate.game.api.script.Execution;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.Conmiro.bots.api.GrandExchange.Exchange.Constants.*;
 
 /**
+ * Deals with the currently displayed Offer. May be an offer
+ * currently being created, or an offer that is existing.
+ * <p>
  * Created by Connor on 7/24/2016.
  */
 public class Offer {
 
-
-    public static Boolean isOpen() {
-        InterfaceComponent inOfferStatusBar = Interfaces.getAt(grandExchangeContainerId, inOfferStatusBarComponentId);
-        if (inOfferStatusBar != null && inOfferStatusBar.isVisible() && inOfferStatusBar.isValid())
-            return true;
-        return false;
-    }
-
-    public static Boolean collect() {
-        if (isOpen()) {
-            InterfaceComponent box1 = Interfaces.getAt(grandExchangeContainerId, collectionBox1ComponentId);
-            InterfaceComponent box2 = Interfaces.getAt(grandExchangeContainerId, collectionBox2ComponentId);
-            if (box1 != null && box1.isVisible() && box1.isValid() && box1.getContainedItem() != null) {
-                return box1.click();
-            }
-
-            if (box2 != null && box2.isVisible() && box2.isValid() && box2.getContainedItem() != null) {
-                return box2.click();
-            }
-        }
-        return false;
-    }
-
     /**
-     * Returns whether or not the current offer has items to collect.
+     * Returns whether an offer page is currently open
      *
-     * @return
+     * @return True if open
      */
-    public static Boolean hasCollectibles() {
-        if (isOpen()){
-            InterfaceComponent box1 = Interfaces.getAt(grandExchangeContainerId, collectionBox1ComponentId);
-            InterfaceComponent box2= Interfaces.getAt(grandExchangeContainerId, collectionBox2ComponentId);
-            if (box1 != null && box1.isVisible() && box1.isValid() && box1.getContainedItem() != null)
-                return true;
-            if (box2 != null && box2.isVisible() && box2.isValid() && box2.getContainedItem() != null)
-                return true;
-        }
-        return false;
+    public static Boolean isOpen() {
+        return !Interfaces.newQuery().containers(grandExchangeContainerId).visible().actions("Back").results().isEmpty();
     }
 
     /**
-     * Backs out of viewing an offer.
+     * Backs out of an offer screen
      *
-     * @return
+     * @return Success
      */
     public static Boolean backOut() {
-        Logger.debug("Backing out of offer.");
         InterfaceComponent backButton = Interfaces.newQuery().actions("Back").results().first();
-        if (backButton!=null && backButton.isVisible() && backButton.isValid()) {
-            return backButton.click();
+        if (backButton != null && backButton.isVisible() && backButton.isValid()) {
+            backButton.click();
+            return Execution.delayUntil(() -> !isOpen(), 2000);
         }
-        Logger.error("Problem backing out of offer.");
         return false;
+    }
+
+    /**
+     * Returns the item name in the currently open offer.
+     *
+     * @return
+     */
+    public static String getCurrentItemName() {
+        InterfaceComponent button = Interfaces.getAt(grandExchangeContainerId, currentItemComponentId);
+        if (button != null)
+            return button.getText();
+        else
+            return null;
+    }
+
+    /**
+     * Returns GrandExchange.Item object for item in current offer.
+     * Allows access to name, price, etc.
+     *
+     * @return
+     */
+    public static GrandExchange.Item getCurrentItem() {
+        InterfaceComponent itemButton = Interfaces.getAt(grandExchangeContainerId, offerItemComponentId);
+        GrandExchange.Item item = null;
+        if (itemButton != null && itemButton.isValid() && itemButton.isVisible()) {
+            item = GrandExchange.lookup(itemButton.getContainedItemId());
+        }
+        return item;
+    }
+
+    /**
+     * Gets the quantity that is being bought or sold.
+     *
+     * @return Quantity of item
+     */
+    public static int getQuantity() {
+        InterfaceComponent textbox = Interfaces.getAt(grandExchangeContainerId, quantityComponentId);
+        if (textbox != null)
+            return Integer.parseInt(textbox.getText());
+        else
+            return -1;
+    }
+
+    /**
+     * Get the type of offer being displayed.
+     *
+     * @return Buy or Sell
+     */
+    public static String getType() {
+        if (!Interfaces.newQuery().visible().textContains("Buy Offer").results().isEmpty())
+            return "Buy";
+        else if (!Interfaces.newQuery().visible().textContains("Sell Offer").results().isEmpty())
+            return "Sell";
+        else
+            return null;
+    }
+
+    /**
+     * Returns the current offer price per item
+     *
+     * @return Item offer price
+     */
+    public static int getCurrentPrice() {
+        Pattern pattern = Pattern.compile("(\\d*) gp");
+        InterfaceComponent priceBox = Interfaces.newQuery().containers(grandExchangeContainerId).visible().texts(pattern).actions("Enter Number").results().first();
+        if (priceBox != null) {
+            //Logger.debug("priceBox text: " + priceBox.getText());
+            Matcher m = pattern.matcher(priceBox.getText());
+            //Logger.debug("Match: " + m.matches());
+            //Logger.debug("Group count: " + m.groupCount());
+            if (m.matches()) {
+                return Integer.parseInt(m.group(1));
+            }
+        }
+        return -1;
     }
 
 
 }
-
-
-
-
